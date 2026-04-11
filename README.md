@@ -1,7 +1,7 @@
-# Adversarial AI — Hands-On Lab Series
+# Adversarial AI Attacks — Hands-On Lab Series
 
 A chapter-by-chapter attack, defense, and MLSecOps implementation series based on
-**Adversarial AI** (Packt). Each chapter is paired with a focused code-along,
+**Adversarial AI Attacks, Mitigations, and Defense Strategies** (Packt). Each chapter is paired with a focused code-along,
 lab session, or both — depending on what the material demands.
 
 ## Target Model
