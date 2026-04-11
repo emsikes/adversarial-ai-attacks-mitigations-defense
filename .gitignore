@@ -1,0 +1,38 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+.eggs/
+*.egg-info/
+dist/
+build/
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb
+
+# Environment
+.env
+*.env
+
+# Model artifacts
+shared/models/*.pt
+shared/models/*.pth
+shared/models/*.h5
+shared/models/*.pkl
+shared/models/*.onnx
+
+# Datasets
+shared/datasets/
+
+# Attack artifacts
+*.pkl
+*_poisoned*
+*_backdoor*
+*_trojan*
+*_adversarial*
+
+# Secrets
+*.pem
+*.key
