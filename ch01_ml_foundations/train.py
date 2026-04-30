@@ -11,7 +11,7 @@ import time
 def train_epoch(
         model: nn.Module,
         loader: DataLoader,
-        optimizer: torch.optim.optimizer,
+        optimizer: torch.optim.Optimizer,
         criterion: nn.Module,
         device: torch.device
 ) -> Tuple[float, float]:
@@ -58,7 +58,7 @@ def evaluate_epoch(
             outputs = model(images)
             loss = criterion(outputs, labels)
             total_loss += loss.item()
-            preds = outputs.margmax(dim=1)
+            preds = outputs.argmax(dim=1)
             correct += (preds == labels).sum().item()
             total += labels.size(0)
 
@@ -73,7 +73,7 @@ def train(
     val_loader: DataLoader,
     device: torch.device,
     epochs: int = 10,
-    learning_rate: float = 1e3,
+    learning_rate: float = 1e-3,
     checkpoint_dir: Path = Path("../shared/models")
 ) -> nn.Module:
     """
@@ -93,7 +93,7 @@ def train(
 
     best_val_acc = 0.0
 
-    for epoch in range(1, epochs, + 1):
+    for epoch in range(1, epochs + 1):
         if epoch == 5:
             print("\nPhase 2: unfreezing backbone layers...")
             model = unfreeze_backbone(model, num_layers=3)
@@ -104,8 +104,8 @@ def train(
             scheduler = CosineAnnealingLR(optimizer, T_max=epochs - epoch)
 
         start = time.time()
-        train_loss, train_acc = train.epoch(
-            model, train_loader, optimizer, device
+        train_loss, train_acc = train_epoch(
+            model, train_loader, optimizer, criterion, device
         )
         val_loss, val_acc = evaluate_epoch(
             model, val_loader, criterion, device

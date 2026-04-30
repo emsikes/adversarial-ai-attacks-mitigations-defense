@@ -65,7 +65,7 @@ def report_dataset_stats(counts: dict) -> None:
               f"ratio: {ratio:.2f}")
     print("-" * 40)
 
-def ChestXRayDataset(Dataset):
+class ChestXRayDataset(Dataset):
     """
     Pytorch Dataset for chest X-ray binary classification.
     Handles NORMAL (0) and PNEUMONIA (1) classes.
@@ -93,66 +93,66 @@ def ChestXRayDataset(Dataset):
     def __getitem__(self, idx: int) -> Tuple:
         img_path = self.samples[idx]
         label = self.labels[idx]
-        image = self.labels[idx]
+        image = Image.open(img_path).convert("RGB")
         if self.transform:
             image = self.transform(image)
 
         return image, label
     
-    def make_weighted_sampler(dataset: ChestXRayDataset) -> WeightedRandomSampler:
-        """
-        Build a WeightedRandomSampler to correct class imbalance.
-        Ensures each training batch sees roughly equal NORMAL/PNEUMONIA.
-        """
-        labels = np.array(dataset.labels)
-        class_counts = np.bincount(labels)
-        class_weights = 1.0 / class_counts
-        sample_weights = class_weights[labels]
-        sampler = WeightedRandomSampler(
-            weights=sample_weights,
-            num_samples=len(sample_weights),
-            replacement=True
-        )
-        
-        return sampler
+def make_weighted_sampler(dataset: ChestXRayDataset) -> WeightedRandomSampler:
+    """
+    Build a WeightedRandomSampler to correct class imbalance.
+    Ensures each training batch sees roughly equal NORMAL/PNEUMONIA.
+    """
+    labels = np.array(dataset.labels)
+    class_counts = np.bincount(labels)
+    class_weights = 1.0 / class_counts
+    sample_weights = class_weights[labels]
+    sampler = WeightedRandomSampler(
+        weights=sample_weights,
+        num_samples=len(sample_weights),
+        replacement=True
+    )
     
-    def get_dataloaders(
-        data_dir: Path,
-        batch_size: int = 32,
-        num_workers: int = 4,
-    ) -> Tuple[DataLoader, DataLoader, DataLoader]:
-        """
-        Build, train, val, and test DataLoaders.
-        Train loader uses WeightedRandomSampler for class balance.
-        Val and test loaders use sequential sampling, no shuffling.
-        """
-        from transformers import get_train_transforms, get_eval_transforms
+    return sampler
+    
+def get_dataloaders(
+    data_dir: Path,
+    batch_size: int = 32,
+    num_workers: int = 4,
+) -> Tuple[DataLoader, DataLoader, DataLoader]:
+    """
+    Build, train, val, and test DataLoaders.
+    Train loader uses WeightedRandomSampler for class balance.
+    Val and test loaders use sequential sampling, no shuffling.
+    """
+    from transforms import get_train_transforms, get_eval_transforms
 
-        train_dataset = ChestXRayDataset(data_dir, "train", get_train_transforms())
-        val_dataset = ChestXRayDataset(data_dir, "val", get_eval_transforms())
-        test_dataset = ChestXRayDataset(data_dir, "test", get_eval_transforms())
+    train_dataset = ChestXRayDataset(data_dir, "train", get_train_transforms())
+    val_dataset = ChestXRayDataset(data_dir, "val", get_eval_transforms())
+    test_dataset = ChestXRayDataset(data_dir, "test", get_eval_transforms())
 
-        train_sampler = make_weighted_sampler(train_dataset)
+    train_sampler = make_weighted_sampler(train_dataset)
 
-        train_loader = DataLoader(
-            train_dataset,
-            batch_size=batch_size,
-            sampler=train_sampler,
-            num_workers=num_workers
-        )
+    train_loader = DataLoader(
+        train_dataset,
+        batch_size=batch_size,
+        sampler=train_sampler,
+        num_workers=num_workers
+    )
 
-        val_loader = DataLoader(
-            val_dataset,
-            batch_size=batch_size,
-            shuffle=False,
-            num_workers=num_workers
-        )
+    val_loader = DataLoader(
+        val_dataset,
+        batch_size=batch_size,
+        shuffle=False,
+        num_workers=num_workers
+    )
 
-        test_loader = DataLoader(
-            test_dataset,
-            batch_size=batch_size,
-            shuffle=False,
-            num_workers=num_workers
-        )
+    test_loader = DataLoader(
+        test_dataset,
+        batch_size=batch_size,
+        shuffle=False,
+        num_workers=num_workers
+    )
 
-        return train_loader, val_loader, test_loader
+    return train_loader, val_loader, test_loader
