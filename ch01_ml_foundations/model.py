@@ -65,7 +65,7 @@ def load_model(path: Path, device: torch.device) -> Tuple[nn.Module, dict]:
     Load model checkpoint from disk.
     Returns model and checkpoint metadata.
     """
-    checkpoint = torch.load(path, map_location=device)
+    checkpoint = torch.load(path, map_location=device, weights_only=True)
     model = build_model()
     model.load_state_dict(checkpoint["model_state_dict"])
     model.to(device)

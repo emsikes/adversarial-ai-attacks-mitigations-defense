@@ -31,7 +31,9 @@ shared/datasets/
 *_poisoned*
 *_backdoor*
 *_trojan*
-*_adversarial*
+*_adversarial_examples*
+*_adversarial_patches*
+*_adversarial_inputs*
 
 # Secrets
 *.pem

@@ -27,6 +27,12 @@ tensorflow-privacy==0.9.0
 # NLP attacks (ch07, ch14)
 textattack==0.3.10
 
+# Security Tooling
+modelscan==0.8.2
+bandit==1.8.3
+safety==3.5.0
+detect-secrets==1.5.0
+
 # Utilities
 python-dotenv==1.0.1
 tqdm==4.67.1
