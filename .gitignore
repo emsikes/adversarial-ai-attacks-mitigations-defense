@@ -8,6 +8,7 @@ __pycache__/
 dist/
 build/
 
+
 # Jupyter
 .ipynb_checkpoints/
 
@@ -37,4 +38,5 @@ shared/datasets/
 
 # Secrets
 *.pem
-*.key
+*.key.venv-wsl/
+.venv-wsl/

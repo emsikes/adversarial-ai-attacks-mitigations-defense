@@ -1,0 +1,102 @@
+{
+  "system_name": "Chest X-Ray Pneumonia Detection Service",
+  "version": "1.0.0",
+  "components": [
+    "FastAPI inference endpoint (/predict)",
+    "EfficientNet-B3 model checkpoint",
+    "Image preprocessing pipeline",
+    "Model loading and serving layer"
+  ],
+  "threats": [
+    {
+      "id": "T-001",
+      "name": "Model Extraction via API Queries",
+      "stride": "Information Disclosure",
+      "atlas_tactic": "AML.TA0006",
+      "risk": "High",
+      "description": "Attacker queries the /predict endpoint repeatedly to reconstruct model behavior and extract surrogate model.",
+      "affected_component": "FastAPI inference endpoint (/predict)",
+      "mitigations": [
+        "Rate limiting on /predict endpoint",
+        "Query anomaly detection",
+        "Prediction confidence rounding"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "T-002",
+      "name": "Adversarial Input Evasion",
+      "stride": "Tampering",
+      "atlas_tactic": "AML.TA0008",
+      "risk": "Critical",
+      "description": "Attacker submits imperceptible X-Ray images that cause the model to misclassify PNEUMONIA as NORMAL.",
+      "affected_component": "Image preprocessing pipeline",
+      "mitigations": [
+        "Input preprocessing defenses",
+        "Adversarial training",
+        "Ensemble detection"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "T-003",
+      "name": "Checkpoint Tampering via Pickle Exploit",
+      "stride": "Tampering",
+      "atlas_tactic": "AML.TA0003",
+      "risk": "Critical",
+      "description": "Attacker replaces best_checkpoint.pt with a trojaned version containing malicious pickle payloads that execute on torch.load()",
+      "affected_component": "EfficientNet-B3 model checkpoint",
+      "mitigations": [
+        "ModelScan on every checkpoint load",
+        "SHA-256 integrity verification",
+        "Signed model artifacts"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "T-004",
+      "name": "Training Data Poisoning",
+      "stride": "Tampering",
+      "atlas_tactic": "AML.TA0003",
+      "risk": "High",
+      "description": "Attacker injects poisoned samples into the training dataset to introduce backdoor triggers or degrade model performance on specific inputs.",
+      "affected_component": "EfficientNet-B3 model checkpoint",
+      "mitigations": [
+        "Dataset provenance verification",
+        "Anomaly detection on training data",
+        "Clean-label detection"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "T-005",
+      "name": "Membership Inference Attack",
+      "stride": "Information Disclosure",
+      "atlas_tactic": "AML.TA0006",
+      "risk": "Medium",
+      "description": "Attacker determines whether specific patient X-rays were used in training data by analyzing model confidence scores, violating patient privacy.",
+      "affected_component": "FastAPI inference endpoint (/predict)",
+      "mitigations": [
+        "Differential privacy during training",
+        "Confidence score rounding",
+        "Output perturbation"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "T-006",
+      "name": "Denial of Service via Large Image Uploads",
+      "stride": "Denial of Service",
+      "atlas_tactic": "AML.TA0008",
+      "risk": "Medium",
+      "description": "Attacker floods /predict with oversized images to exhaust GPU memory and crash the inference service.",
+      "affected_component": "FastAPI inference endpoint (/predict)",
+      "mitigations": [
+        "File size limits on upload",
+        "Request rate limiting",
+        "Input validation before preprocessing"
+      ],
+      "notes": ""
+    }
+  ]
+}
