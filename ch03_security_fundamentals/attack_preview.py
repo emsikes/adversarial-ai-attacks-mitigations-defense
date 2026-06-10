@@ -97,8 +97,16 @@ def compare_predictions(
     """
     class_names = ["NORMAL", "PNEUMONIA"]
 
-    orig_probs = classifier.predict(original_array)
-    adv_probs = classifier.predict(adversarial_array)
+    orig_logits = classifier.predict(original_array)
+    adv_logits = classifier.predict(adversarial_array)
+
+    # Apply softmax to convert logits to probabilities
+    def softmax(x):
+        e_x = np.exp(x - np.max(x, axis=1, keepdims=True))
+        return e_x / e_x.sum(axis=1, keepdims=True)
+
+    orig_probs = softmax(orig_logits)
+    adv_probs = softmax(adv_logits)
 
     orig_class = np.argmax(orig_probs, axis=1)[0]
     adv_class = np.argmax(adv_probs, axis=1)[0]
@@ -206,13 +214,13 @@ if __name__ == "__main__":
             sys.exit(1)
     else:
         print("Local dataset not found — streaming sample from HuggingFace...")
+        from datasets import load_dataset
         ds = load_dataset(
-            "keremberke/chest-xray-classification",
-            name="full",
+            "hf-vision/chest-xray-pneumonia",
             split="test",
             streaming=True
         )
-        sample = next(iter(ds.filter(lambda x: x["labels"] == 1)))
+        sample = next(iter(ds.filter(lambda x: x["label"] == 1)))
         original_image = sample["image"].convert("RGB")
         print("Streaming sample loaded — PNEUMONIA class.")
 
